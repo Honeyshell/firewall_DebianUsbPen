@@ -68,13 +68,41 @@ iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
 iptables -t filter -A INPUT -p tcp --dport 53 -j ACCEPT
 iptables -t filter -A INPUT -p udp --dport 53 -j ACCEPT
 
-# HTTP
-iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
-iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+# SERVER WEB APACHE
+#iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
+#iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+#iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+#iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
+#iptables -t filter -A INPUT -p tcp --dport 8443 -j ACCEPT
+
+# SAMBA
+# Ajouter -s 192.168.1.0/24 pour mettre en réseau local
+iptables -t filter -A INPUT -p tcp --dport 137:139 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 137:139 -j ACCEPT
+
+iptables -t filter -A INPUT -p tcp --dport 445 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 445 -j ACCEPT
+
+# Ports à ouvrir pour les partages Windows via SAMBA
+#LDAP
+iptables -t filter -A INPUT -p tcp --dport 389 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 389 -j ACCEPT
+#NETBIOS
+iptables -t filter -A INPUT -p tcp --dport 445 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 445 -j ACCEPT
+#SWAT
+iptables -t filter -A INPUT -p tcp --dport 901 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 901 -j ACCEPT
 
 # FTP
 # iptables -t filter -A OUTPUT -p tcp --dport 20:21 -j ACCEPT
 # iptables -t filter -A INPUT -p tcp --dport 20:21 -j ACCEPT
+
+# FTP POUR OVH
+# iptables -t filter -A OUTPUT -p tcp --dport 20:21 -j ACCEPT
+# modprobe ip_conntrack_ftp
+# iptables -t filter -A INPUT -p tcp --dport 20:21 -j ACCEPT
+# iptables -t filter -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 # Mail SMTP
 # iptables -t filter -A INPUT -p tcp --dport 25 -j ACCEPT
@@ -84,6 +112,13 @@ iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
 # iptables -t filter -A INPUT -p tcp --dport 110 -j ACCEPT
 # iptables -t filter -A OUTPUT -p tcp --dport 110 -j ACCEPT
 
+# Mail POP3S:995
+# iptables -t filter -A INPUT -p tcp --dport 995 -j ACCEPT
+# iptables -t filter -A OUTPUT -p tcp --dport 995 -j ACCEPT
+
+# Monit
+# iptables -t filter -A INPUT -p tcp --dport 1337 -j ACCEPT
+
 # Mail IMAP
 # iptables -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
 # iptables -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
@@ -91,14 +126,12 @@ iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
 # NTP (horloge du serveur)
 iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
 
-# service		port d’écoute 	protocole
-# ssh			    22				  tcp
-# web/HTTP		80				  tcp
-# FTP			    20 et 21		tcp
-# mail/SMTP		25				  tcp
-# mail/POP3		110				  tcp
-# mail/IMAP		143				  tcp
-# DNS			    53				  tcp et udp
+# RPS OVH
+# Si vous utilisez un serveur RPS d'OVH, le disque iSCSI
+# nécessite un accès réseau qui rend obligatoire une règle
+# supplémentaire au début des filtres. Sans cela, votre serveur
+# deviendra inutilisable :
+# iptables -A OUTPUT -p tcp --dport 3260 -m state --state NEW,ESTABLISHED -j ACCEPT
 
 # Flood ou déni de service
 iptables -A FORWARD -p tcp --syn -m limit --limit 1/second -j ACCEPT
