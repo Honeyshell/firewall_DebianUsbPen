@@ -47,7 +47,6 @@ iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -t filter -A INPUT -i lo -j ACCEPT
 iptables -t filter -A OUTPUT -o lo -j ACCEPT
 
-
 # Ouvrir les ports utilisés :
 
 # ICMP (Ping)
@@ -129,6 +128,7 @@ iptables -t filter -A OUTPUT -p tcp --dport 901 -j ACCEPT
 
 # NTP (horloge du serveur)
 iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
+iptables -t filter -A INPUT -p udp --dport 123 -j ACCEPT
 
 # RPS OVH
 # Si vous utilisez un serveur RPS d'OVH, le disque iSCSI
